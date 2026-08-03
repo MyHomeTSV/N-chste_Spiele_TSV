@@ -16,21 +16,30 @@
       height: 100%;
     }
 
+    /*
+      ANPASSUNGSWERTE:
+      --crop-top    = Pixel, die oben abgeschnitten werden
+      --crop-height = Pixel, die danach noch sichtbar bleiben (Höhe)
+      --crop-left   = Pixel, die links abgeschnitten werden
+      --crop-right  = Pixel, die rechts abgeschnitten werden
+    */
     :root {
-      --crop-left: 60px;   /* linker Pfeil-Button wird abgeschnitten */
-      --crop-right: 240px; /* rechter Pfeil + "Zum Spiel"-Link werden abgeschnitten */
-      --max-height: 1700px; /* Gesamthöhe des sichtbaren Bereichs (Anzahl Spiele) */
-    }
+      --crop-top: 240px;
+      --crop-height: 0px;
+      --crop-left: 0px;
+      --crop-right: 0px;
+      --zoom: 1.0; /* 1.0 = normale Größe, 1.3 = 30% größer, 1.5 = 50% größer usw. */
 
     #viewport {
       width: 100vw;
-      max-height: var(--max-height);
+      height: var(--crop-height);
       overflow: hidden;
       position: relative;
     }
 
     #shifter {
-      position: relative;
+      position: absolute;
+      top: calc(-1 * var(--crop-top));
       left: calc(-1 * var(--crop-left));
       width: calc(100% + var(--crop-left) + var(--crop-right));
     }
@@ -38,11 +47,6 @@
     .fussballde_widget {
       width: 100% !important;
       zoom: var(--zoom);
-    }
-
-    /* Diese Klasse setzen wir per JavaScript auf die Filter-/Suchzeile */
-    .tsv-hidden-bar {
-      display: none !important;
     }
   </style>
 </head>
@@ -55,41 +59,3 @@
         data-type="club-matches"
         style="width: 100%"
       ></div>
-    </div>
-  </div>
-
-  <script>
-    // Sucht das Suchfeld ("Nächste Spiele") im Widget und blendet die
-    // ganze Zeile drumherum (Pfeile + Suchfeld + Filter-Icon) aus.
-    function hideFilterBar(widgetEl) {
-      var inputs = widgetEl.querySelectorAll('input');
-      var hiddenAny = false;
-      var widgetWidth = widgetEl.offsetWidth;
-
-      inputs.forEach(function (input) {
-        var el = input;
-        for (var i = 0; i < 6 && el.parentElement; i++) {
-          el = el.parentElement;
-          if (el.offsetWidth >= widgetWidth * 0.85) {
-            el.classList.add('tsv-hidden-bar');
-            hiddenAny = true;
-            break;
-          }
-        }
-      });
-
-      return hiddenAny;
-    }
-
-    var widgetEl = document.querySelector('.fussballde_widget');
-    var attempts = 0;
-    var timer = setInterval(function () {
-      attempts++;
-      var done = hideFilterBar(widgetEl);
-      if (done || attempts > 100) {
-        clearInterval(timer);
-      }
-    }, 200);
-  </script>
-</body>
-</html>
